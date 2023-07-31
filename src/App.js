@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState }from 'react';
 import logo from './logo.svg';
 import { Counter } from './features/counter/Counter';
 import './App.css';
@@ -12,6 +12,7 @@ import {
   createBrowserRouter,
   RouterProvider,
   Route,
+  Routes,
   Link,
 } from "react-router-dom";
 import { Signup } from './features/auth/components/Signup';
@@ -21,10 +22,11 @@ import Checkout from './pages/Checkout';
 import ProductDetail from './features/product/components/ProductDetail';
 import ProductDetailPage from './pages/ProductDetailPage';
 
+
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Home/>
+    element: <Home />
   },
   {
     path: "login",
@@ -45,15 +47,21 @@ const router = createBrowserRouter([
   {
     path: "product-detail",
     element: <ProductDetailPage/>,
-  }
+  },
+  
+
 ]);
 
 
 
 function App() {
+
+  const [cartData, setCartData ] =useState([])
   return (
     <div className="App">
-      <RouterProvider router={router} />
+      
+      <RouterProvider router={router} >
+      </RouterProvider>
     </div>
   );
 }

@@ -7,6 +7,8 @@ import {
 } from "@heroicons/react/24/outline";
 import React from "react";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+
 
 const user = {
   name: "Tom Cook",
@@ -32,6 +34,11 @@ function classNames(...classes) {
 }
 
 function Navbar({ children }) {
+
+  let cartproducts = useSelector((state) => state.product.cartproducts)
+
+  const cartNumber =  cartproducts.reduce((acc,item) => acc + item.cartQuantity , 0)
+
   return (
     <>
       <div className="min-h-full">
@@ -82,10 +89,10 @@ function Navbar({ children }) {
                         />
                         
                       </button>
-                      </Link>
 
-                      <span className="inline-flex items-center rounded-md mb-5 -ml-3 bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">
-                        3
+                      </Link>
+                      <span className="inline-flex text-center items-center h-5 w-5 rounded-full mb-7 -ml-3 bg-red-50 px-1 py-2 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">
+                        {cartNumber}
                       </span>
 
                       {/* Profile dropdown */}
@@ -190,7 +197,7 @@ function Navbar({ children }) {
                     <Link to ="/cart">
                     <button
                       type="button"
-                      className="ml-auto flex-shrink-0 rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                      className="ml-auto flex-shrink-0 rounded-md bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
                     >
                       <span className="sr-only">View notifications</span>
                       <ShoppingCartIcon
@@ -200,9 +207,10 @@ function Navbar({ children }) {
                       
                     </button>
                     </Link>
-                    <span className="inline-flex items-center rounded-md mb-7 -ml-3 bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">
-                        3
-                      </span>
+                    <div className="rounded-full h-5 w-5 mb-7 -ml-3 bg-red-300 border text-center">
+                    /* inline-flex border h-5 w-5 items-center rounded-full mb-7 -ml-3 bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10 */">
+                    {cartNumber}
+                      </div>
                   </div>
                   <div className="mt-3 space-y-1 px-2">
                     {userNavigation.map((item) => (

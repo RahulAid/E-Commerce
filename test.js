@@ -1835,10 +1835,10 @@ const products = [
 ]
 
 
-const brands = [...new Set([...products.map(p => p.brand)])]
+const brands = [...new Set([...products.map(p => p.category)])]
 
-//console.log(categories)
+console.log(brands)
 
-const a = brands.map(c=> ({value:c,label:c.split('-').join(' '),checked:false}))
+//const a = brands.map(c=> ({value:c,label:c.split('-').join(' '),checked:false}))
 
-console.log(a)
+//console.log(a)

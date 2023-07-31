@@ -1,43 +1,35 @@
-import React, { useState, Fragment } from "react";
+import React, { useState,useEffect, Fragment } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { increment, incrementAsync, selectCount } from "./cartSlice";
 
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
+import { removefromcart,lowerItemValue, increaseItemValue} from "../product/productSlice";
 
-const products = [
-  {
-    id: 1,
-    name: "Throwback Hip Bag",
-    href: "#",
-    color: "Salmon",
-    price: "$90.00",
-    quantity: 1,
-    imageSrc:
-      "https://tailwindui.com/img/ecommerce-images/shopping-cart-page-04-product-01.jpg",
-    imageAlt:
-      "Salmon orange fabric pouch with match zipper, gray zipper pull, and adjustable hip belt.",
-  },
-  {
-    id: 2,
-    name: "Medium Stuff Satchel",
-    href: "#",
-    color: "Blue",
-    price: "$32.00",
-    quantity: 1,
-    imageSrc:
-      "https://tailwindui.com/img/ecommerce-images/shopping-cart-page-04-product-02.jpg",
-    imageAlt:
-      "Front of satchel with blue canvas body, black straps and handle, drawstring top, and front zipper pouch.",
-  },
-  // More products...
-];
+
 
 export default function Cart() {
-  const count = useSelector(selectCount);
+  //const count = useSelector(selectCount);
+
+  let cartproducts = useSelector((state) => state.product.cartproducts);
+
+  const removeItem = (product) => {
+  dispatch(removefromcart(product))
+  }
+
+  const lowerItemValues = (product) => {
+    dispatch(lowerItemValue(product))
+  }
+
+  const increaseItemValues = (product) => {
+    dispatch(increaseItemValue(product))
+  }
+ 
   const dispatch = useDispatch();
   const [open, setOpen] = useState(true);
+
+  const Subtotal = cartproducts.reduce((acc,item) => acc+ item.cartQuantity*item.price, 0)
 
   return (
     <>
@@ -48,12 +40,12 @@ export default function Cart() {
           </h1>
           <div className="flow-root">
             <ul role="list" className="-my-6 divide-y divide-gray-200">
-              {products.map((product) => (
+              {cartproducts.map((product) => (
                 <li key={product.id} className="flex py-6">
                   <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                     <img
-                      src={product.imageSrc}
-                      alt={product.imageAlt}
+                      src={product.thumbnail}
+                      alt={product.thumbnail}
                       className="h-full w-full object-cover object-center"
                     />
                   </div>
@@ -62,9 +54,9 @@ export default function Cart() {
                     <div>
                       <div className="flex justify-between text-base font-medium text-gray-900">
                         <h3>
-                          <a href={product.href}>{product.name}</a>
+                          <a /* href={product.href} */>{product.title}</a>
                         </h3>
-                        <p className="ml-4">{product.price}</p>
+                        <p className="ml-4">${product.cartQuantity * product.price}</p>
                       </div>
                       <p className="mt-1 text-sm text-gray-500">
                         {product.color}
@@ -77,19 +69,20 @@ export default function Cart() {
                           className="inline text-sm mr-5 font-medium leading-6 text-gray-600"
                         >
                           Qty
+                        <button className="   h-11 w-11 text-2xl" onClick={()=>lowerItemValues(product)}>-</button>
+                        <a className=" bg-slate-300 px-6 py-3 h-11 w-auto">{product.cartQuantity}</a>
+                        <button className="  h-11 w-11 text-2xl" onClick={()=>increaseItemValues(product)}>+</button>
                         </label>
-                        <select className="cursor-pointer">
-                          <option value="1">1</option>
-                          <option value="2">2</option>
-                          <option value="3">3</option>
-                        </select>
-                      </div>
+                        
+
+                        </div>
+                      
 
                       <div className="flex">
                         <button
                           type="button"
                           className="font-medium text-indigo-600 hover:text-indigo-500"
-                        >
+                        onClick={()=> removeItem(product)}>
                           Remove
                         </button>
                       </div>
@@ -104,7 +97,7 @@ export default function Cart() {
         <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
           <div className="flex justify-between text-base font-medium text-gray-900">
             <p>Subtotal</p>
-            <p>$262.00</p>
+            <p>${Subtotal}</p>
           </div>
           <p className="mt-0.5 text-sm text-gray-500">
             Shipping and taxes calculated at checkout.

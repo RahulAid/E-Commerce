@@ -1,6 +1,6 @@
 import React, { useState,useEffect, Fragment } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchAllProductsAsync, fetchProductsByFiltersAsync,selectAllProducts } from "../productSlice";
+import { fetchAllProductsAsync, fetchProductsByFiltersAsync,selectAllProducts,addtocart,fetchcartProductsAsync, addQuery} from "../productSlice";
 import { ChevronLeftIcon, ChevronRightIcon, StarIcon } from "@heroicons/react/20/solid";
 import { Dialog, Disclosure, Menu, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
@@ -12,12 +12,12 @@ import {
   Squares2X2Icon,
 } from "@heroicons/react/20/solid";
 import { Link } from "react-router-dom";
-
+import {useCart} from 'react-use-cart';
 
 const sortOptions = [
-  { name: "Most Popular", thumbnail: "#", current: true },
+  /* { name: "Most Popular", thumbnail: "#", current: true },
+  { name: "Newest", thumbnail: "#", current: false }, */
   { name: "Best Rating", sort: "rating", order:"desc", current: false },
-  { name: "Newest", thumbnail: "#", current: false },
   { name: "Price: Low to High", sort: "price", order:"asc", current: false },
   { name: "Price: High to Low", sort: "price", order:"desc", current: false },
 ];
@@ -232,6 +232,101 @@ const filters = [
  
 ];
 
+/* const newFilters = [
+  'Apple',
+  'Samsung',
+  'OPPO',
+  'Huawei',
+  'Microsoft Surface',
+  'Infinix',
+  'HP Pavilion',
+  'Impression of Acqua Di Gio',
+  'Royal_Mirage',
+  'Fog Scent Xpressio',
+  'Al Munakh',
+  'Lord - Al-Rehab',
+  "L'Oreal Paris",
+  'Hemani Tea',
+  'Dermive',
+  'ROREC White Rice',
+  'Fair & Clear',
+  'Saaf & Khaas',
+  'Bake Parlor Big',
+  'Baking Food Items',
+  'fauji',
+  'Dry Rose',
+  'Boho Decor',
+  'Flying Wooden',
+  'LED Lights',
+  'luxury palace',
+  'Golden',
+  'Furniture Bed Set',
+  'Ratttan Outdoor',
+  'Kitchen Shelf',
+  'Multi Purpose',
+  'AmnaMart',
+  'Professional Wear',
+  'Soft Cotton',
+  'Top Sweater',
+  'RED MICKY MOUSE..',
+  'Digital Printed',
+  'Ghazi Fabric',
+  'IELGY',
+  'IELGY fashion',
+  'Synthetic Leather',
+  'Sandals Flip Flops',
+  'Maasai Sandals',
+  'Arrivals Genuine',
+  'Vintage Apparel',
+  'FREE FIRE',
+  'The Warehouse',
+  'Sneakers',
+  'Rubber',
+  'Naviforce',
+  'SKMEI 9117',
+  'Strap Skeleton',
+  'Stainless',
+  'Eastern Watches',
+  'Luxury Digital',
+  'Watch Pearls',
+  'Bracelet',
+  'LouisWill',
+  'Copenhagen Luxe',
+  'Steal Frame',
+  'Darojay',
+  'Fashion Jewellery',
+  'Cuff Butterfly',
+  'Designer Sun Glasses',
+  'mastar watch',
+  'Car Aux',
+  'W1209 DC12V',
+  'TC Reusable',
+  'Neon LED Light',
+  'METRO 70cc Motorcycle - MR70',
+  'BRAVE BULL',
+  'shock absorber',
+  'JIEPOLLY',
+  'Xiangle',
+  'lightingbrilliance',
+  'Ifei Home',
+  'DADAWU',
+  'YIOSI'
+]
+
+const newCategories = [
+  'smartphones',    'laptops',        
+  'fragrances',     'skincare',       
+  'groceries',      'home-decoration',
+  'furniture',      'tops',
+  'womens-dresses', 'womens-shoes',   
+  'mens-shirts',    'mens-shoes',     
+  'mens-watches',   'womens-watches',
+  'womens-bags',    'womens-jewellery',
+  'sunglasses',     'automotive',
+  'motorcycle',     'lighting'
+] */
+
+
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
@@ -243,22 +338,49 @@ export function ProductList() {
   const dispatch = useDispatch();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const products = useSelector(selectAllProducts)
-  const [filter,setFilter] = useState({})
 
-  const handleFilter = (e,section,option) =>{
-    const newFilter = {...filter,[section.id]:option.value}
-    setFilter(newFilter)
-    dispatch(fetchProductsByFiltersAsync(filter))
-    console.log(section.id,option.value)
+  const [tempFilter,setTempFilter] = useState([])
+  const query = useSelector(state=> state.product.query)
+
+
+  const addToCart = (e,{product}) => {
+
+    e.stopPropagation()
+    const item = {id:product.id,title:product.title,color:"white",price:product.price,thumbnail:product.thumbnail}
+  
+    dispatch(addtocart(item))
     
   }
 
-  const handleSort = (e,option) =>{
+  const handleFilter = (e,section,option) =>{
     
-    const newFilter = {...filter,_sort:option.sort,_opton:option.order}
-    setFilter(newFilter)
+   if(e.target.checked){
+    tempFilter.push({[section.id]:option.value})
+    
+    const queryString = tempFilter.map(obj => Object.entries(obj).map(([key,value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`).join(`&`)).join(`&`)
+    dispatch(fetchProductsByFiltersAsync(queryString))
+    dispatch(addQuery(queryString))
+
+
+   }else if(!e.target.checked){
+    const hm = tempFilter.findIndex((item) => item.category || item.brand === option.value)
+    tempFilter.splice(hm,hm+1)
+    const queryString = tempFilter.map(obj => Object.entries(obj).map(([key,value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`).join(`&`)).join(`&`)
+    dispatch(fetchProductsByFiltersAsync(queryString))
+    dispatch(addQuery(queryString))
+    
+   }
+    
+   
+  }
+
+  const handleSort = (e,option,queryString) =>{
+    
+    const a = '&_sort='+option.sort+'&'+'_order='+option.order
+    const filter = query+a
+    
     dispatch(fetchProductsByFiltersAsync(filter))
-   // console.log(section.id,option.value)
+    console.log("Filter including sort",filter)
     
   }
 
@@ -266,11 +388,17 @@ export function ProductList() {
 
   useEffect(() => {
     dispatch(fetchAllProductsAsync())
+    
+  
   },[dispatch])
 
 
   return (
     <div>
+
+
+
+
       <div>
         <div className="bg-white">
           <div>
@@ -509,7 +637,7 @@ export function ProductList() {
                                       type="checkbox"
                                       defaultChecked={option.checked}
                                       onChange={e=>handleFilter(e,section,option)}
-                                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                      className=" h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                                     />
                                     <label
                                       htmlFor={`filter-${section.id}-${optionIdx}`}
@@ -527,6 +655,10 @@ export function ProductList() {
                     ))}
                   </form>
 
+                  {/* Newly added filters and categories */}
+
+                  {/* {newCategories.map((item) =>{ return <div className="cursor-pointer">{item}</div>})} */}
+
                   {/* Product grid */}
                   <div className="lg:col-span-3">
                     {/* This is our Product List */}
@@ -534,8 +666,11 @@ export function ProductList() {
                       <div className="mx-auto max-w-2xl px-4 py-0 sm:px-6 sm:py-0 lg:max-w-7xl lg:px-8">
                         <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
                           {products.map((product) => (
-                            <Link to="/product-detail">
+                            <div>
+                              <button className="border mt-6" onClick={(e) => addToCart(e,{product})}>Add to Cart</button>
                               <div key={product.id} className="group relative border-solid border-2 border-gray-200 p-2">
+                              <div>
+                              <Link to="/product-detail">
                                 <div className="min-h-60 aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-60">
                                   <img
                                     src={product.thumbnail}
@@ -561,18 +696,23 @@ export function ProductList() {
                                   </div>
                                   <div>
 
-                                  <p className="text-sm font-medium text-gray-900">
+                                  {/* <p className="text-sm font-medium text-gray-900">
                                     ${Math.round(product.price*(1-product.discountPercentage/100))}
-                                  </p>
+                                  </p> */}
 
-                                  <p className="text-sm font-medium line-through text-gray-400">
+                                  <p className="text-sm font-medium  text-gray-700">
                                     ${product.price}
                                   </p>
                                   
                                   </div>
                                 </div>
-                              </div>
                             </Link>
+                            </div>
+                            <hr/>
+                            
+                              </div>
+                            
+                            </div>
                           ))}
                         </div>
                       </div>

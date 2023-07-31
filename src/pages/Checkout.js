@@ -1,35 +1,16 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 
-const products = [
-  {
-    id: 1,
-    name: "Throwback Hip Bag",
-    href: "#",
-    color: "Salmon",
-    price: "$90.00",
-    quantity: 1,
-    imageSrc:
-      "https://tailwindui.com/img/ecommerce-images/shopping-cart-page-04-product-01.jpg",
-    imageAlt:
-      "Salmon orange fabric pouch with match zipper, gray zipper pull, and adjustable hip belt.",
-  },
-  {
-    id: 2,
-    name: "Medium Stuff Satchel",
-    href: "#",
-    color: "Blue",
-    price: "$32.00",
-    quantity: 1,
-    imageSrc:
-      "https://tailwindui.com/img/ecommerce-images/shopping-cart-page-04-product-02.jpg",
-    imageAlt:
-      "Front of satchel with blue canvas body, black straps and handle, drawstring top, and front zipper pouch.",
-  },
-  // More products...
-];
+import {
+  removefromcart,
+  lowerItemValue,
+  increaseItemValue,
+  addAddress,
+  deleteAddress,
+} from "../features/product/productSlice";
 
-const addresses = [
+/* const addresses = [
   {
     name: "John Wick",
     street: "1st cross",
@@ -46,9 +27,49 @@ const addresses = [
     state: "Pattaya",
     phone: "0000000000",
   },
-];
+]; */
 
 const Checkout = () => {
+  const dispatch = useDispatch();
+  const cartData = useSelector((state) => state.product.cartproducts);
+  const addresses = useSelector((state) => state.product.address);
+  useEffect(() => {
+    console.log("data from checkout page", userDetails);
+  });
+
+  const subTotal = cartData.reduce(
+    (acc, item) => acc + item.cartQuantity * item.price,
+    0
+  );
+
+  const [userDetails, setUserDetails] = useState({
+    fname: "",
+    lname: "",
+    email: "",
+    street: "",
+    city: "",
+    pinCode: 1234,
+    state: "",
+    phone: 1234,
+  });
+
+  const addAddresses = (e, userDetails) => {
+    e.preventDefault();
+    dispatch(addAddress(userDetails));
+  };
+  const deleteAddresses = (e, address) => {
+    e.preventDefault();
+    dispatch(deleteAddress(address));
+  };
+
+  const lowerItemValues = (product) => {
+    dispatch(lowerItemValue(product));
+  };
+
+  const increaseItemValues = (product) => {
+    dispatch(increaseItemValue(product));
+  };
+
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-5">
@@ -73,6 +94,12 @@ const Checkout = () => {
                     </label>
                     <div className="mt-2">
                       <input
+                        onChange={(e) =>
+                          setUserDetails({
+                            ...userDetails,
+                            fname: e.target.value,
+                          })
+                        }
                         type="text"
                         name="first-name"
                         id="first-name"
@@ -91,6 +118,12 @@ const Checkout = () => {
                     </label>
                     <div className="mt-2">
                       <input
+                        onChange={(e) =>
+                          setUserDetails({
+                            ...userDetails,
+                            lname: e.target.value,
+                          })
+                        }
                         type="text"
                         name="last-name"
                         id="last-name"
@@ -102,6 +135,29 @@ const Checkout = () => {
 
                   <div className="sm:col-span-4">
                     <label
+                      htmlFor="phone"
+                      className="block text-sm font-medium leading-6 text-gray-900"
+                    >
+                      Phone
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        onChange={(e) =>
+                          setUserDetails({
+                            ...userDetails,
+                            phone: e.target.value,
+                          })
+                        }
+                        id="phone"
+                        name="phone"
+                        type="text"
+                        /*  */
+                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      />
+                    </div>
+                  </div>
+                  <div className="sm:col-span-4">
+                    <label
                       htmlFor="email"
                       className="block text-sm font-medium leading-6 text-gray-900"
                     >
@@ -109,6 +165,12 @@ const Checkout = () => {
                     </label>
                     <div className="mt-2">
                       <input
+                        onChange={(e) =>
+                          setUserDetails({
+                            ...userDetails,
+                            email: e.target.value,
+                          })
+                        }
                         id="email"
                         name="email"
                         type="email"
@@ -118,7 +180,7 @@ const Checkout = () => {
                     </div>
                   </div>
 
-                  <div className="sm:col-span-3">
+                  {/* <div className="sm:col-span-3">
                     <label
                       htmlFor="country"
                       className="block text-sm font-medium leading-6 text-gray-900"
@@ -137,7 +199,7 @@ const Checkout = () => {
                         <option>Mexico</option>
                       </select>
                     </div>
-                  </div>
+                  </div> */}
 
                   <div className="col-span-full">
                     <label
@@ -148,6 +210,12 @@ const Checkout = () => {
                     </label>
                     <div className="mt-2">
                       <input
+                        onChange={(e) =>
+                          setUserDetails({
+                            ...userDetails,
+                            street: e.target.value,
+                          })
+                        }
                         type="text"
                         name="street-address"
                         id="street-address"
@@ -166,6 +234,12 @@ const Checkout = () => {
                     </label>
                     <div className="mt-2">
                       <input
+                        onChange={(e) =>
+                          setUserDetails({
+                            ...userDetails,
+                            city: e.target.value,
+                          })
+                        }
                         type="text"
                         name="city"
                         id="city"
@@ -184,6 +258,12 @@ const Checkout = () => {
                     </label>
                     <div className="mt-2">
                       <input
+                        onChange={(e) =>
+                          setUserDetails({
+                            ...userDetails,
+                            state: e.target.value,
+                          })
+                        }
                         type="text"
                         name="region"
                         id="region"
@@ -202,6 +282,12 @@ const Checkout = () => {
                     </label>
                     <div className="mt-2">
                       <input
+                        onChange={(e) =>
+                          setUserDetails({
+                            ...userDetails,
+                            pinCode: e.target.value,
+                          })
+                        }
                         type="text"
                         name="postal-code"
                         id="postal-code"
@@ -214,21 +300,22 @@ const Checkout = () => {
               </div>
 
               <div className="mt-6 flex items-center justify-end gap-x-6">
-              <button
-                type="button"
-                className="text-sm font-semibold leading-6 text-gray-900"
-              >
-                Reset
-              </button>
-              <button
-                type="submit"
-                className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-              >
-                Add Address
-              </button>
-            </div>
+                <button
+                  type="button"
+                  className="text-sm font-semibold leading-6 text-gray-900"
+                >
+                  Reset
+                </button>
+                <button
+                  type="submit"
+                  className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                  onClick={(e) => addAddresses(e, userDetails)}
+                >
+                  Add Address
+                </button>
+              </div>
 
-              <div className="border-b border-gray-900/10 pb-12">
+              <div className="border-b border-gray-900/10 pb-12 mt-9">
                 <h2 className="text-base font-semibold leading-7 text-gray-900">
                   Address
                 </h2>
@@ -252,10 +339,17 @@ const Checkout = () => {
                         />
                         <div className="min-w-0 flex-auto">
                           <p className="text-sm font-semibold leading-6 text-gray-900">
-                            {address.name}
+                            {address.fname} {address.lname}
                           </p>
+
                           <p className="mt-1 truncate text-xs leading-5 text-gray-500">
                             {address.street}
+                          </p>
+                          <p className="mt-1 truncate text-xs leading-5 text-gray-500">
+                            {address.city}
+                          </p>
+                          <p className="mt-1 truncate text-xs leading-5 text-gray-500">
+                            {address.state} - {address.pinCode}
                           </p>
                         </div>
                       </div>
@@ -263,20 +357,13 @@ const Checkout = () => {
                         <p className="text-sm leading-6 text-gray-900">
                           Phone : {address.phone}
                         </p>
-                        {address.street ? (
-                          <p className="mt-1 text-xs leading-5 text-gray-500">
-                            <time dateTime={address.city}>{address.city}</time>
-                          </p>
-                        ) : (
-                          <div className="mt-1 flex items-center gap-x-1.5">
-                            <div className="flex-none rounded-full bg-emerald-500/20 p-1">
-                              <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                            </div>
-                            <p className="text-xs leading-5 text-gray-500">
-                              Online
-                            </p>
-                          </div>
-                        )}
+
+                        <button
+                          className="mt-16 border bg-slate-300 p-1"
+                          onClick={(e) => deleteAddresses(e, address)}
+                        >
+                          Delete
+                        </button>
                       </div>
                     </li>
                   ))}
@@ -326,8 +413,6 @@ const Checkout = () => {
                 </div>
               </div>
             </div>
-
-            
           </form>
         </div>
         <div className="lg:col-span-2">
@@ -338,12 +423,12 @@ const Checkout = () => {
               </h1>
               <div className="flow-root">
                 <ul role="list" className="-my-6 divide-y divide-gray-200">
-                  {products.map((product) => (
+                  {cartData.map((product) => (
                     <li key={product.id} className="flex py-6">
                       <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                         <img
-                          src={product.imageSrc}
-                          alt={product.imageAlt}
+                          src={product.thumbnail}
+                          alt={product.thumbnail}
                           className="h-full w-full object-cover object-center"
                         />
                       </div>
@@ -352,9 +437,11 @@ const Checkout = () => {
                         <div>
                           <div className="flex justify-between text-base font-medium text-gray-900">
                             <h3>
-                              <a href={product.href}>{product.name}</a>
+                              <a href={product.thumbnail}>{product.title}</a>
                             </h3>
-                            <p className="ml-4">{product.price}</p>
+                            <p className="ml-4">
+                              {product.cartQuantity * product.price}
+                            </p>
                           </div>
                           <p className="mt-1 text-sm text-gray-500">
                             {product.color}
@@ -367,12 +454,22 @@ const Checkout = () => {
                               className="inline text-sm mr-5 font-medium leading-6 text-gray-600"
                             >
                               Qty
+                              <button
+                                className="h-11 w-11 text-2xl"
+                                onClick={() => lowerItemValues(product)}
+                              >
+                                -
+                              </button>
+                              <a className=" bg-slate-300 px-6 py-3 h-11 w-auto">
+                                {product.cartQuantity}
+                              </a>
+                              <button
+                                className="h-11 w-11 text-2xl"
+                                onClick={() => increaseItemValues(product)}
+                              >
+                                +
+                              </button>
                             </label>
-                            <select className="cursor-pointer">
-                              <option value="1">1</option>
-                              <option value="2">2</option>
-                              <option value="3">3</option>
-                            </select>
                           </div>
 
                           <div className="flex">
@@ -394,16 +491,13 @@ const Checkout = () => {
             <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
               <div className="flex justify-between text-base font-medium text-gray-900">
                 <p>Subtotal</p>
-                <p>$262.00</p>
+                <p>{subTotal}</p>
               </div>
               <p className="mt-0.5 text-sm text-gray-500">
                 Shipping and taxes calculated at checkout.
               </p>
               <div className="mt-6">
-                <Link
-                  to="/pay"
-                  className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
-                >
+                <Link className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700">
                   Pay and Order
                 </Link>
               </div>
