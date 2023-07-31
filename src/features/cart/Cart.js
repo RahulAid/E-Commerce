@@ -1,6 +1,5 @@
 import React, { useState,useEffect, Fragment } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { increment, incrementAsync, selectCount } from "./cartSlice";
 
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
@@ -10,7 +9,6 @@ import { removefromcart,lowerItemValue, increaseItemValue} from "../product/prod
 
 
 export default function Cart() {
-  //const count = useSelector(selectCount);
 
   let cartproducts = useSelector((state) => state.product.cartproducts);
 
