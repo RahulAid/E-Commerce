@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 const initialState = {
   products: [],
   status: "idle",
-  query: "" ,
+  query: localStorage.getItem("query") ? localStorage.getItem("query") : "",
   cartproducts: localStorage.getItem("cartItems")
   ? JSON.parse(localStorage.getItem("cartItems"))
   : [],
@@ -108,7 +108,15 @@ export const productSlice = createSlice({
        },
 
        addQuery: (state,action) => {
-        state.query = action.payload
+        if(state.query.includes(action.payload)){
+          state.query = state.query.replace(action.payload,'')
+          localStorage.setItem("query",state.query)
+          //console.log("Deleted",state.query)
+        }else{
+          state.query = state.query+action.payload
+          //console.log("Added",state.query)
+          localStorage.setItem("query",state.query)
+        }
        }
 
 

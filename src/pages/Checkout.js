@@ -70,6 +70,10 @@ const Checkout = () => {
     dispatch(increaseItemValue(product));
   };
 
+  const removefromcarts = (product) => {
+  dispatch(removefromcart(product))
+  }
+
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-5">
@@ -476,6 +480,7 @@ const Checkout = () => {
                             <button
                               type="button"
                               className="font-medium text-indigo-600 hover:text-indigo-500"
+                              onClick={() => removefromcarts(product)}
                             >
                               Remove
                             </button>

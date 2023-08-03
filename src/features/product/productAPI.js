@@ -9,7 +9,7 @@ export function fetchAllProducts() {
     }  );
 }
 
-export function fetchProductsByFilters(queryString,a) {
+export function fetchProductsByFilters(queryString) {
 
   /* let queryString = ""
 
